@@ -12,8 +12,8 @@ RUN wget --quiet https://nodejs.org/dist/v4.4.4/node-v4.4.4-linux-x64.tar.xz -O 
 # Not using git ...
 #
  
-RUN wget --quiet https://raw.githubusercontent.com/frjaraur/docker-tools/master/simpleapp.js && \
- wget --quiet https://raw.githubusercontent.com/frjaraur/docker-tools/master/package.json
+RUN wget --quiet https://raw.githubusercontent.com/frjaraur/docker-simplest-nodeapp/master/simpleapp.js && \
+ wget --quiet https://raw.githubusercontent.com/frjaraur/docker-simplest-nodeapp/master/package.json
 
 ENV PATH $PATH:/${APPDIR}/bin
 RUN npm install 
