@@ -36,30 +36,36 @@ http.createServer(function (req, res) {
   }
 //  res.end('date [' + appdate + ']  appserverip: ' + serverip+' appservername: '+hostname+'\n');
 
-  res.end('appserverip: ' + serverip+' appservername: '+hostname+' clientip: '+clientip+'\n');
 
   pg.connect(conString, function (err, client, done) {
 
     if (err) {
       return console.error('error fetching client from pool', err)
     }
-;
-    //client.query('SELECT * from demo', function (err, result) {
-      client.query('INSERT INTO demo VALUES ('+appdate+','+serverip+','+clientip+','+appdate+')', function (err, result) {
-      done()
+    //client.query('SELEC'INSERT INTO demo VALUES ('+appdate+',quote_literal('+serverip+'),quote_literal('+clientip+'),Now())';T * from demo', function (err, result) {
 
-      if (err) {
-        return console.error('error happened during query', err)
-      }
+    var insert='INSERT INTO demo(serverip,clientip,date) VALUES (\''+serverip+'\',\''+clientip+'\',Now())';
 
-      console.log(result.rows[0])
-      //process.exit(0)
-    })
+    console.log(insert);
+
+      client.query(insert, function (err, result) {
+          done()
+
+          if (err) {
+            return console.error('error happened during query', err)
+          }
+
+          console.log(result.rows[0])
+          //process.exit(0)
+      })
+      client.end
 
   })
 
+  res.end('appserverip: ' + serverip+' appservername: '+hostname+' clientip: '+clientip+'\n');
 
   console.log("Request received from " + clientip);
+
 }).listen(port);
 
 
