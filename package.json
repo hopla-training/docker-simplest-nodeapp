@@ -1,14 +1,16 @@
 {
-  "name": "simpleapp",
+  "name": "simpledbapp",
   "version": "1.0.0",
   "description": "",
-  "main": "simpleapp.js",
+  "main": "simpledbapp.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "my-local-ip": "^1.0.0"
+    "my-local-ip": "^1.0.0",
+    "pg": "latest",
+    "ipaddr.js": "latest"
   }
 }

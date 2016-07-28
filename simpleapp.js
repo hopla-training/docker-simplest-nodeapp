@@ -1,17 +1,72 @@
 var args = process.argv.slice(2);
+const pg = require('pg')
 var http=require('http');
-var myip=require('my-local-ip')()
+var serverip=require('my-local-ip')()
 var hostname=require('os').hostname();
 
-// Port must be define .... :| will try do it better...
 var port=args[0];
+
+var appdate=+new Date();
+
+var config = require('./dbconfig.json');
+
+console.log(config.dbuser + ' ' + config.dbpasswd);
+console.log(config.dbhost + ' ' + config.dbname);
+
+const conString = 'postgres://' + config.dbuser + ':' + config.dbpasswd + '@' + config.dbhost + '/' + config.dbname;
 
 http.createServer(function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
 //  res.write('sdfsdfsdfsssdfsdf\n');
-  res.end(myip+' - '+hostname+'\n');
-  console.log("Request received from " + req.connection.remoteAddress);
+  //res.end('date [' + appdate + ']  appserverip: ' + serverip+' appservername: '+hostname+'\n');
+  var clientip = req.connection.remoteAddress;
+  var ipaddr = require('ipaddr.js');
+  if (ipaddr.IPv4.isValid(clientip)) {
+    // ipString is IPv4
+  } else if (ipaddr.IPv6.isValid(clientip)) {
+      var ip = ipaddr.IPv6.parse(clientip);
+    if (ip.isIPv4MappedAddress()) {
+      clientip=ip.toIPv4Address().toString();
+    } else {
+      if (ip == "::1"){ip="localhost";}
+      clientip=ip;
+    }
+  } else {
+    clientip="Unknown";
+  }
+//  res.end('date [' + appdate + ']  appserverip: ' + serverip+' appservername: '+hostname+'\n');
+
+  res.end('appserverip: ' + serverip+' appservername: '+hostname+' clientip: '+clientip+'\n');
+
+  pg.connect(conString, function (err, client, done) {
+
+    if (err) {
+      return console.error('error fetching client from pool', err)
+    }
+;
+    //client.query('SELECT * from demo', function (err, result) {
+      client.query('INSERT INTO demo VALUES ('+appdate+','+serverip+','+clientip+','+appdate+')', function (err, result) {
+      done()
+
+      if (err) {
+        return console.error('error happened during query', err)
+      }
+
+      console.log(result.rows[0])
+      //process.exit(0)
+    })
+
+  })
+
+
+  console.log("Request received from " + clientip);
 }).listen(port);
 
-console.log(myip+' - '+hostname)
-console.log('Server running at http://localhost:'+port+'/');
+
+
+
+
+
+console.log('[' + appdate + ']  ' + serverip+' - '+hostname);
+
+console.log('Server running at http://'+serverip+':'+port+'/');
