@@ -5,6 +5,7 @@ ENV APPDIR /APP
 WORKDIR ${APP}
 COPY simpleapp.js simpleapp.js
 COPY package.json package.json
+COPY dbconfig.json dbconfig.json
 RUN npm install 
 CMD ["node","simpleapp.js","3000"]
 EXPOSE 3000
